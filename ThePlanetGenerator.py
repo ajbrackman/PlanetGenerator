@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from turtle import width
 import kivy
 kivy.require('2.1.0')
 from kivy.base import runTouchApp
@@ -9,37 +10,23 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
+import pandas as pd
+import numpy
+import random
+import csv
+import sys
 
-PlanetTypes = ["Random", "Garden", "Ruins", "Megacity"]
-StarTypes = ["Binary", "Red Giant", "White Dwarf", "Red Dwarf", "Medium Yellow", "Medium Orange", "Blue Giant", "Supernova"]
+PlanetTypes = pd.read_excel(r"C:\Users\brack\Documents\github\PlanetGenerator\planetTypes.xlsx", header=0)
+StarTypes = pd.read_excel(r"C:\Users\brack\Documents\github\PlanetGenerator\starTypes.xlsx", header=0)
 
-# class PlanetGenerator(GridLayout):
+print(PlanetTypes)
+print(StarTypes)
+PlanetList = list(PlanetTypes['Planet Types'].astype(str).values.tolist())
+print(PlanetList)
+StarList = list(StarTypes['Star Types'].astype(str).values.tolist())
+print(StarList)
+# PlanetList = PlanetTypes.to_string()
 
-#     def __init__(self, **kwargs):
-#         super(PlanetGenerator, self).__init__(**kwargs)
-#         self.cols = 2
-#         self.size = (300, 300)
-#         self.add_widget(Label(text='Planet Type'))
-#         self.add_widget(Spinner(text='Random',
-#             values=(PlanetTypes)))
-#     # PlanetTypeSpinner = Spinner(text='Random',
-#     # values=(PlanetTypes),
-#     # size=(100, 44)
-
-# class GeneratorApp(App):
-#     def build(self):
-
-#         layout = GridLayout(cols=2, row_force_default=True, row_default_height=40)
-#         self.labelObject = Label(text="Planet Type: ")
-#         layout.add_widget(self.labelObject)
-#         self.spinnerObject = Spinner(text='Random', values=(PlanetTypes))
-#         self.spinnerObject.size_hint = (0.3,0.2)
-#         self.spinnerObject.pos_hint = {'x': .1, 'y':.75}
-
-#         layout.add_widget(self.spinnerObject)
-#         # self.spinnerObject.bind(text=self.on_spinner_select)
-
-#         return layout;
 class GeneratorApp(App):
     def build(self):
 
@@ -52,7 +39,7 @@ class GeneratorApp(App):
         self.PlanetType = Label(text="Planet Type: ")
         layout.add_widget(self.PlanetType)
 
-        self.planetSpinner = Spinner(text='Random', values=(PlanetTypes))
+        self.planetSpinner = Spinner(text='Random', values=(PlanetList))
         self.planetSpinner.size_hint = (0.3,0.2)
         self.planetSpinner.pos_hint = {'x': .1, 'y':.75}
         layout.add_widget(self.planetSpinner)
@@ -62,7 +49,7 @@ class GeneratorApp(App):
         layout.add_widget(self.starType)
 
 
-        self.starSpinner = Spinner(text='Random', values=(StarTypes))
+        self.starSpinner = Spinner(text='Random', values=(StarList))
         self.starSpinner.size_hint = (0.3,0.2)
         self.starSpinner.pos_hint = {'x': .1, 'y':.75}
         layout.add_widget(self.starSpinner)
@@ -70,8 +57,10 @@ class GeneratorApp(App):
 
         self.GeneratePlanet = Button(text='Generate a planet!')
         layout.add_widget(self.GeneratePlanet)
+        self.GeneratePlanet.bind(on_press = self.on_button_press)
 
-        self.GeneratedPlanetObject = Label(text=f'You have entered orbit around a {self.planetSpinner.text} which is in orbit around a {self.starSpinner.text})')
+        self.GeneratedPlanetObject = Label(text=f'You have entered orbit around a {self.planetSpinner.text} which is in orbit around a {self.starSpinner.text})', font_size = self.texture_size)
+        self.GeneratedPlanetObject.size_hint = (0.2,0.2)
         layout.add_widget(self.GeneratedPlanetObject)
 
         return layout;
@@ -82,10 +71,33 @@ class GeneratorApp(App):
         print('The star spinner has chosen', self.starSpinner.text)
     
     def on_button_press(self, instance):
-         if self.planetSpinner.text == 'Random':
-            
 
-    
+        if self.planetSpinner.text == 'Random' and self.starSpinner.text == 'Random':
+            RandomPlanet = random.choice(PlanetList)
+            RandomStar = random.choice(StarList)
+            print(RandomStar)
+            print(RandomPlanet)
+            self.GeneratedPlanetObject.text = f'You have entered orbit around a {RandomPlanet} world, which is in orbit around a {RandomStar} star.'
+
+        elif self.planetSpinner.text == 'Random':
+            RandomPlanet = random.choice(PlanetList)
+            print(RandomPlanet)
+            self.GeneratedPlanetObject.text = f'You have entered orbit around a {RandomPlanet} world, which is in orbit around a {self.starSpinner.text} star.'
+        
+        elif self.starSpinner.text == 'Random':
+            RandomStar = random.choice(StarList)
+            print(RandomStar)
+            self.GeneratedPlanetObject.text = f'You have entered orbit around a {self.planetSpinner.text} world, which is in orbit around a {RandomStar} star.'
+
+        elif self.planetSpinner.text == 'Random' and self.starSpinner.text == 'Random':
+            RandomPlanet = random.choice(PlanetList)
+            RandomStar = random.choice(StarList)
+            print(RandomStar)
+            print(RandomPlanet)
+            self.GeneratedPlanetObject.text = f'You have entered orbit around a {RandomPlanet}, which is in orbit around a {RandomStar} star.'
+           
+        else:
+            print(self.planetSpinner.text)       
 
 if __name__ == '__main__':
     GeneratorApp().run()
